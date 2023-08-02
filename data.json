@@ -1,0 +1,18 @@
+[
+  {
+    "model": "catalog.category",
+    "pk": 1,
+    "fields": {
+      "category_name": "Фрукты",
+      "category_description": "Сочные фрукты с Кавказа"
+    }
+  },
+  {
+    "model": "catalog.category",
+    "pk": 2,
+    "fields": {
+      "category_name": "Овощи",
+      "category_description": "Только свежие, охлажденные овощи с Казахстана"
+    }
+  }
+]

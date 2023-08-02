@@ -1,0 +1,45 @@
+{% extends 'catalog/base.html' %}
+{% load static %}
+{% load media_tags %}
+
+{% block content %}
+
+<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+    <h1 class="display-4">YumYumStore</h1>
+    <p class="lead">YumYumStore - лучший онлайн магазин продуктов</p>
+    <a class="btn btn-primary" href="{% url 'blog:create' %}" role="button">Добавить новый блог</a>
+</div>
+
+<div class="container">
+
+    <div class="row text-center">
+        {% for object in object_list %}
+        <div class="col-3">
+            <div class="card mb-4 box-shadow">
+                <img src="{% mediapath object.preview %}" class="card-img-top">
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">{{ object.title }}</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mt-5 mb-4 text-start m-3">
+                        <li>- {{ object.body }}</li>
+                    </ul>
+                    <div class="btn=group">
+                        <a class="btn btn-outline-primary" href="{% url 'blog:detail' object.pk %}" role="button">Посмотреть</a>
+                        <a class="btn btn-outline-dark" href="{% url 'blog:update' object.pk %}"
+                           role="button">Изменить</a>
+                        <a class="btn btn-outline-danger" href="{% url 'blog:delete' object.pk %}" role="button">Удалить</a>
+                    </div>
+                    {% if object.is_published %}
+                    <a  class="btn btn-warning" href="{% url 'blog:published' object.pk %}">Деактивировать</a>
+                    {% else %}
+                    <a class="btn btn-success" href="{% url 'blog:published' object.pk %}">Активировать</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

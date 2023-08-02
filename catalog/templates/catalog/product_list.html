@@ -1,0 +1,43 @@
+{% extends 'catalog/base.html' %}
+{% load static %}
+{% load media_tags %}
+
+{% block content %}
+
+<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+    <h1 class="display-4">YumYumStore</h1>
+    <p class="lead">YumYumStore - лучший онлайн магазин продуктов</p>
+    <a class="btn btn-primary" href="{% url 'catalog:create' %}" role="button">Добавить новый продукт</a>
+</div>
+
+<div class="container">
+
+    <div class="row text-center">
+        {% for object in object_list %}
+        <div class="col-3">
+            <div class="card mb-4 box-shadow">
+                <img src="{% mediapath object.image %}" class="card-img-top">
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">{{ object.name }}</h4>
+                </div>
+                <div class="card-body">
+                    <h1 class="card-title pricing-card-title">{{ object.price }} ₽</h1>
+                    <ul class="list-unstyled mt-3 mb-4 text-start m-3">
+                        <li> {{ object.description|truncatewords:15 }} </li>
+                        {% for version in object.version.all %}
+                        <li>Активная версия: {{ version.name }}</li>
+                        {% endfor %}
+                    </ul>
+                    <a class="btn btn-lg btn-block btn-outline-primary" href="#" role="button">Купить</a>
+                    <a class="btn btn-outline-danger" href="{% url 'catalog:delete' object.pk %}"
+                       role="button">Удалить</a>
+                    <a class="btn btn-outline-dark" href="{% url 'catalog:update' object.pk %}"
+                       role="button">Изменить</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}
