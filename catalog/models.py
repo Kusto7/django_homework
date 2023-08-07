@@ -1,4 +1,7 @@
 from django.db import models
+from django import forms
+from django.conf import settings
+from django.core.exceptions import ValidationError
 
 NULLABLE = {'blank': True, 'null': True}
 
@@ -24,6 +27,7 @@ class Product(models.Model):
     price = models.IntegerField(default=0, verbose_name='Цена за покупку')
     date_create = models.DateField(auto_now_add=True, verbose_name='Дата создания')
     date_modified = models.DateField(auto_now=True, verbose_name='Дата изменения')
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, **NULLABLE, verbose_name='Автор')
 
     def __str__(self):
         # Строковое отображение объекта
@@ -46,3 +50,8 @@ class Version(models.Model):
     class Meta:
         verbose_name = 'Версия'  # Настройка для наименования одного объекта
         verbose_name_plural = 'Версии'  # Настройка для наименования набора объектов
+
+    def clean(self) -> None:
+        super().clean()
+        if Version.objects.filter(product=self.product, is_activity=True).get() != self and self.is_activity:
+            raise forms.ValidationError('Активная версия может быть только одна')

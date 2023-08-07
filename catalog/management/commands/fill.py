@@ -7,21 +7,21 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        Product.objects.all().delete()
-        Category.objects.all().delete()
-
-        category_list = [
-            {'name': 'Фрукты', 'description': 'Фрукты из Кавказа'},
-            {'name': 'Овощи', 'description': 'Овощи прям с огорода'}
-        ]
-
-        categories_for_create = []
-        for category in category_list:
-            categories_for_create.append(Category(**category))
-
-        print(categories_for_create)
-
-        Category.objects.bulk_create(categories_for_create)
+        # Product.objects.all().delete()
+        # Category.objects.all().delete()
+        #
+        # category_list = [
+        #     {'name': 'Фрукты', 'description': 'Фрукты из Кавказа'},
+        #     {'name': 'Овощи', 'description': 'Овощи прям с огорода'}
+        # ]
+        #
+        # categories_for_create = []
+        # for category in category_list:
+        #     categories_for_create.append(Category(**category))
+        #
+        # print(categories_for_create)
+        #
+        # Category.objects.bulk_create(categories_for_create)
 
         products_list = [
             {'id': 1, 'name': 'Картошка', 'description': 'Картоха из Беларуссии', 'image': 'картошка.png',

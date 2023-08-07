@@ -4,14 +4,20 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, DeleteView, UpdateView
 
 
-from catalog.forms import ProductForm, VersionForm
+from catalog.forms import ProductForm, VersionForm, StyleFormMixin
 from catalog.models import Product, Version
 
 
-class ProductCreateView(CreateView):
+class ProductCreateView(StyleFormMixin, CreateView):
     model = Product
     form_class = ProductForm
     success_url = reverse_lazy('catalog:list')
+
+    def form_valid(self, form):
+        self.object = form.save()
+        self.object.owner = self.request.user
+        self.object.save()
+        return super().form_valid(form)
 
 
 class ProductUpdateView(UpdateView):
@@ -31,11 +37,15 @@ class ProductUpdateView(UpdateView):
     def form_valid(self, form):
         formset = self.get_context_data()['formset']
         self.object = form.save()
+        if not self.request.user.is_superuser and not self.request.user.is_staff:
+            self.object.owner = self.request.user
+        self.object.save()
         if formset.is_valid():
             formset.instance = self.object
             formset.save()
-
-        return super().form_valid(form)
+            return super().form_valid(form)
+        else:
+            return super().form_invalid(form)
 
 
 class ProductDeleteView(DeleteView):
