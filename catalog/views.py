@@ -1,23 +1,41 @@
 from django.forms import inlineformset_factory
 from django.shortcuts import render
 from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView, DeleteView, UpdateView
+from django.core.cache import cache
+from django.conf import settings
+from django.views.generic import ListView, CreateView, DeleteView, UpdateView, DetailView
+
+from catalog.forms import ProductForm, VersionForm
+from catalog.models import Product, Version, Category
+from catalog.services import get_cached_category_list
 
 
-from catalog.forms import ProductForm, VersionForm, StyleFormMixin
-from catalog.models import Product, Version
-
-
-class ProductCreateView(StyleFormMixin, CreateView):
+class ProductCreateView(CreateView):
     model = Product
     form_class = ProductForm
     success_url = reverse_lazy('catalog:list')
+
+    def get_context_data(self, *args, **kwargs):
+        context_data = super().get_context_data(*args, **kwargs)
+        all_product = Product.objects.all()
+        context_data['all_product_list'] = all_product
+        context_data['category_list'] = get_cached_category_list
+        return context_data
 
     def form_valid(self, form):
         self.object = form.save()
         self.object.owner = self.request.user
         self.object.save()
         return super().form_valid(form)
+
+
+class ProductDetailView(DetailView):
+    model = Product
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        context_data['category_list'] = get_cached_category_list()
+        return context_data
 
 
 class ProductUpdateView(UpdateView):
@@ -27,6 +45,7 @@ class ProductUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
+        context_data['category_list'] = get_cached_category_list()
         version_formset = inlineformset_factory(Product, Version, form=VersionForm, extra=1)
         if self.request.method == "POST":
             context_data['formset'] = version_formset(self.request.POST, instance=self.object)
