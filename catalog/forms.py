@@ -1,5 +1,8 @@
 ﻿from django import forms
 from catalog.models import Product, Version
+from django.core.exceptions import ValidationError
+
+danger_words = ['казино', 'криптовалюта', 'крипта', 'биржа', 'дешево', 'бесплатно', 'обман', 'полиция', 'радар']
 
 
 class StyleFormMixin:
@@ -16,7 +19,6 @@ class ProductForm(StyleFormMixin, forms.ModelForm):
 
     def clean_name(self):
         cleaned_data = self.cleaned_data['name']
-        danger_words = ['казино', 'криптовалюта', 'крипта', 'биржа', 'дешево', 'бесплатно', 'обман', 'полиция', 'радар']
 
         if cleaned_data in danger_words:
             raise forms.ValidationError('Название некорректное, придумайте другое.')
@@ -24,13 +26,11 @@ class ProductForm(StyleFormMixin, forms.ModelForm):
         return cleaned_data
 
     def clean_description(self):
-        cleaned_data = self.cleaned_data['description']
-        danger_words = ['казино', 'криптовалюта', 'крипта', 'биржа', 'дешево', 'бесплатно', 'обман', 'полиция', 'радар']
-
-        if danger_words in cleaned_data:
-            raise forms.ValidationError('В описании используются некорректные слова.')
-
-        return cleaned_data
+        cleaned_description = self.cleaned_data['description']
+        for exclusion_word in danger_words:
+            if exclusion_word in cleaned_description.lower():
+                raise forms.ValidationError('Описание содержит некорректные слова')
+            return cleaned_description
 
 
 class VersionForm(StyleFormMixin, forms.ModelForm):
